@@ -8,6 +8,7 @@ export const usePosts = () => {
 
     const [isLoading, setLoading] = useState<boolean>(false);
     const [posts, setPosts] = useState<IPost[]>([]);
+    const [error, setError] = useState<string>("");
     
     const pagination = useMemo(() => {
         return {
@@ -24,8 +25,8 @@ export const usePosts = () => {
             const result = await $axios.get<IPost[]>('/posts', {params: {...pagination}})
             setPosts(result.data)
         }
-        catch (e) {
-            console.log(e)
+        catch (e: any) {
+            setError(e.data.message)
         }
         finally {
             setLoading(false)
@@ -34,19 +35,18 @@ export const usePosts = () => {
 
     useEffect(() => {
         fetchPosts()
-    }, [])
+    }, [pagination])
 
     const handlePagination = (currentPage: number) => {
         if (currentPage) setPage(currentPage)
         //if (currLimit) setLimit(currLimit)
-        
-        fetchPosts()
     }
 
 
     return {
         posts,
         isLoading,
+        error,
 
         page,
         limit,
